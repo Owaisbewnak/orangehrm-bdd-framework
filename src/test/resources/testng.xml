@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
 <!-- Default suite: runs the full regression (smoke scenarios are also tagged
-     @regression, so they run here too). The @locked scenario is excluded —
+     @regression, so they run here too). Sequential (parallel="none",
+     thread-count="1") since 2026-11-25: CI Run #1 ran 3 threads in parallel
+     and failed 10/17 on the shared demo. The @locked scenario is excluded —
      it locks the shared demo Admin account, so run it only on demand with
      LockedAccountRunner. -->
-<suite name="OrangeHRM BDD Suite" parallel="methods" thread-count="3" verbose="1">
+<suite name="OrangeHRM BDD Suite" parallel="none" thread-count="1" verbose="1">
     <test name="Regression">
         <classes>
             <class name="com.owais.orangehrm.runners.RegressionRunner"/>

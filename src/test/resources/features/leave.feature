@@ -20,11 +20,13 @@ Feature: Leave — Apply for Leave
     Then the leave should be applied successfully
 
   Scenario: Apply for leave with To date before From date
+    Given the logged-in employee has a "CAN - Personal" leave entitlement
     When I navigate to the Leave module
     And I apply for "CAN - Personal" leave from 10 days from today to 7 days from today
     Then I should see a leave validation error containing "after"
 
   Scenario Outline: Apply for different leave types
+    Given the logged-in employee has a "<leaveType>" leave entitlement
     When I navigate to the Leave module
     And I apply for "<leaveType>" leave from 7 days from today to 9 days from today
     Then the leave should be applied successfully

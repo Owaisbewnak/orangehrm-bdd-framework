@@ -1,10 +1,9 @@
 package com.owais.orangehrm.pages;
 
 import com.owais.orangehrm.utils.TestContext;
-
-import org.openqa.selenium.Keys;
 import com.owais.orangehrm.utils.WaitUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -27,8 +26,19 @@ public class LeavePage extends BasePage {
         super(driver);
     }
 
+    /**
+     * Leave List header, waited for with the full explicit wait (30s).
+     * Same fix as DashboardPage on 2026-11-25: the old 5s check in
+     * BasePage.isDisplayed() failed in CI Run #1 ("Leave List was not
+     * displayed") even though the page was still loading.
+     */
     public boolean isLeaveListDisplayed() {
-        return isDisplayed(LEAVE_LIST_HEADER);
+        try {
+            WaitUtils.waitForVisibility(driver, LEAVE_LIST_HEADER);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void openApplyTab() {
@@ -39,6 +49,8 @@ public class LeavePage extends BasePage {
     public void selectLeaveType(String leaveType) {
         click(LEAVE_TYPE_DROPDOWN);
         WaitUtils.waitForAllVisible(driver, DROPDOWN_OPTION);
+        // Click by locator, not by a WebElement held from the list above —
+        // the dropdown re-renders and that held element goes stale.
         By option = By.xpath("//div[@role='listbox']//span[normalize-space()='" + leaveType + "']");
         if (driver.findElements(option).isEmpty()) {
             throw new IllegalArgumentException("Leave type not found in dropdown: " + leaveType);
@@ -46,14 +58,18 @@ public class LeavePage extends BasePage {
         click(option);
     }
 
-
-    /** Dates in yyyy-MM-dd, e.g. 2026-12-05. First input = From, second = To. */
+    /** Dates in yyyy-dd-MM — the demo site's format (see the "2026-31-12"
+     *  date on Leave List, and the yyyy-dd-mm placeholder). E.g. 1 Dec 2026
+     *  is "2026-01-12". First input = From, second = To. */
     public void setDates(String fromDate, String toDate) {
         List<WebElement> inputs = WaitUtils.waitForAllVisible(driver, DATE_INPUTS);
         setDate(inputs.get(0), fromDate);
         setDate(inputs.get(1), toDate);
     }
 
+    /** clear() does not clear OrangeHRM's masked date inputs — the old
+     *  value stays and sendKeys appends to it, giving e.g.
+     *  "2026-12-012026-12-04" in the To field. Select-all + Delete first. */
     private void setDate(WebElement input, String date) {
         input.click();
         input.sendKeys(Keys.chord(Keys.CONTROL, "a"));
@@ -61,7 +77,6 @@ public class LeavePage extends BasePage {
         input.sendKeys(date);
         input.sendKeys(Keys.TAB);
     }
-
 
     public void enterComment(String comment) {
         type(COMMENT, comment);

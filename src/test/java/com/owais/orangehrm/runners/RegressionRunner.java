@@ -24,9 +24,13 @@ import org.testng.annotations.DataProvider;
 )
 public class RegressionRunner extends AbstractTestNGCucumberTests {
 
-    /** Parallel scenario execution (3 threads, see testng.xml). */
+    /** Sequential execution (parallel = false, see testng.xml).
+     *  The regression ran in parallel (3 threads) in CI Run #1 and failed
+     *  10/17 — 3 browsers at once, all as the same Admin on the shared
+     *  demo, overloaded the site (toasts missed, pages timing out). One
+     *  scenario at a time is slower but stable on this demo. */
     @Override
-    @DataProvider(parallel = true)
+    @DataProvider(parallel = false)
     public Object[][] scenarios() {
         return super.scenarios();
     }
