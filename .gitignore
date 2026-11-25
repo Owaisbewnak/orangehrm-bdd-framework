@@ -1,0 +1,22 @@
+# Maven build output
+target/
+
+# Test reports and screenshots
+allure-results/
+allure-report/
+test-output/
+*.log
+
+# IDE / OS
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.DS_Store
+Thumbs.db
+
+# Secrets / local overrides (never commit real credentials)
+local.properties
